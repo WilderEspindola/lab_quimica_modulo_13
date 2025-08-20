@@ -1421,7 +1421,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.12
+      scalar: 0.11
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -5917,7 +5917,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 37124835}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1.92e-13}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5926,7 +5926,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.00062561, y: -0.000024319}
+  m_AnchoredPosition: {x: -7.8, y: -0.000024319}
   m_SizeDelta: {x: 244.77, y: 41.438}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &37124837
@@ -11753,8 +11753,8 @@ Transform:
   m_GameObject: {fileID: 100658461}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.9999986, z: -0, w: 0.001662977}
-  m_LocalPosition: {x: -7.383, y: 0.515, z: 2.778}
-  m_LocalScale: {x: 0.10387397, y: 1, z: 0.10743583}
+  m_LocalPosition: {x: -7.383, y: 0.515, z: 2.828}
+  m_LocalScale: {x: 0.10387397, y: 1, z: 0.100668445}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1481161668}
@@ -15339,6 +15339,8 @@ MonoBehaviour:
   pressureVolumeSource: {fileID: 16870266}
   temperatureSource: {fileID: 498567356}
   pressureLimit: 65
+  speedIncreaseRate: 0.04
+  speedInterval: 1
 --- !u!82 &246145629
 AudioSource:
   m_ObjectHideFlags: 0
@@ -48867,13 +48869,13 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
-  m_fontSizeBase: 18
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -50877,7 +50879,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9804a6598ac4afb49b62252584f5e83b, type: 3}
       propertyPath: m_LocalScale.z
-      value: -3.0147378
+      value: -2.860082
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9804a6598ac4afb49b62252584f5e83b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -50885,7 +50887,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9804a6598ac4afb49b62252584f5e83b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.084
+      value: -0.092
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 9804a6598ac4afb49b62252584f5e83b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -79254,6 +79256,8 @@ MonoBehaviour:
   pressureVolumeSource: {fileID: 16870266}
   temperatureSource: {fileID: 498567356}
   pressureLimit: 85
+  speedIncreaseRate: 0.04
+  speedInterval: 1
 --- !u!82 &1885768549
 AudioSource:
   m_ObjectHideFlags: 0
@@ -79404,6 +79408,8 @@ MonoBehaviour:
   pressureVolumeSource: {fileID: 16870266}
   temperatureSource: {fileID: 498567356}
   pressureLimit: 73
+  speedIncreaseRate: 0.04
+  speedInterval: 1
 --- !u!82 &1886366655
 AudioSource:
   m_ObjectHideFlags: 0
@@ -84346,7 +84352,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.13
+      scalar: 0.12
       minScalar: 1
       maxCurve:
         serializedVersion: 2

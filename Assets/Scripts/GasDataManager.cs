@@ -1,6 +1,7 @@
-using TMPro;
+Ôªøusing TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Text;
 
 public class GasDataManager : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class GasDataManager : MonoBehaviour
     [Header("UI de Reporte")]
     public TextMeshProUGUI textoReporte;
 
-    [Header("ConfiguraciÛn de Colores")]
+    [Header("Configuraci√≥n de Colores")]
     public Color colorNormal = Color.black;
     public Color colorAlerta = new Color(1f, 0.5f, 0f);
     public Color colorPeligro = Color.red;
@@ -25,45 +26,138 @@ public class GasDataManager : MonoBehaviour
     [Range(0.8f, 1f)] public float umbralPeligro = 0.9f;
 
     private string nombreGasActivo = "";
-    private float limitePresionGas = 100f; // Valor por defecto (vacÌo)
+    private float limitePresionGas = 100f;
+    private float velocidadActualReporte = 0f;
+    private float velocidadAnteriorReporte = 0f;
+    private string tendenciaVelocidad = "";
+    private float updateTimer = 0f;
+    private const float updateInterval = 1f;
+    private StringBuilder reportBuilder = new StringBuilder();
+
+    // Velocidades de referencia FIJAS para cada gas
+    private const float velocidadReferenciaHidrogeno = 8.00f;
+    private const float velocidadReferenciaOxigeno = 4.00f;
+    private const float velocidadReferenciaCO2 = 2.50f;
+
+    // Variables para control de estado
+    private string gasActivoAnterior = "";
+    private bool primerReporte = true;
 
     private void Update()
     {
-        ActualizarReporte();
+        updateTimer += Time.deltaTime;
+
+        if (updateTimer >= updateInterval)
+        {
+            ActualizarDatos();
+            updateTimer = 0f;
+        }
+    }
+
+    private void ActualizarDatos()
+    {
         DetectarGasActivo();
-        ActualizarLimitePresion(); // Nueva funciÛn
+        ActualizarLimitePresion();
+        GestionarCambioDeGas();
+        SimularCambioVelocidad();
+        DeterminarTendencia();
+        ActualizarReporte();
     }
 
     private void DetectarGasActivo()
     {
-        if (oxigenoController.targetParticleSystem.isPlaying)
+        nombreGasActivo = "";
+
+        if (oxigenoController != null && oxigenoController.targetParticleSystem != null &&
+            oxigenoController.targetParticleSystem.isPlaying)
         {
-            nombreGasActivo = "OXÕGENO";
+            nombreGasActivo = "OX√çGENO";
         }
-        else if (hidrogenoController.targetParticleSystem.isPlaying)
+        else if (hidrogenoController != null && hidrogenoController.targetParticleSystem != null &&
+                 hidrogenoController.targetParticleSystem.isPlaying)
         {
-            nombreGasActivo = "HIDR”GENO";
+            nombreGasActivo = "HIDR√ìGENO";
         }
-        else if (co2Controller.targetParticleSystem.isPlaying)
+        else if (co2Controller != null && co2Controller.targetParticleSystem != null &&
+                 co2Controller.targetParticleSystem.isPlaying)
         {
-            nombreGasActivo = "DI”XIDO DE CARBONO";
+            nombreGasActivo = "DI√ìXIDO DE CARBONO";
         }
-        else
+    }
+
+    private void GestionarCambioDeGas()
+    {
+        // Si cambi√≥ el gas activo, resetear la velocidad al valor inicial del nuevo gas
+        if (nombreGasActivo != gasActivoAnterior && !string.IsNullOrEmpty(nombreGasActivo))
         {
-            nombreGasActivo = "";
+            velocidadActualReporte = GetVelocidadReferenciaGas();
+            primerReporte = false;
         }
+
+        gasActivoAnterior = nombreGasActivo;
     }
 
     private void ActualizarLimitePresion()
     {
         if (botonSubir != null)
         {
-            // Usar el mÈtodo que ya existe en DualPartButton para obtener el lÌmite
             limitePresionGas = botonSubir.ObtenerLimiteActual();
         }
         else
         {
-            limitePresionGas = 100f; // Valor por defecto
+            limitePresionGas = 100f;
+        }
+    }
+
+    private void SimularCambioVelocidad()
+    {
+        velocidadAnteriorReporte = velocidadActualReporte;
+
+        // Solo simular cambios si hay un gas activo
+        if (!string.IsNullOrEmpty(nombreGasActivo))
+        {
+            bool fuegoActivo = temperatureController != null && temperatureController.IsFireActive;
+            float velocidadReferencia = GetVelocidadReferenciaGas();
+
+            if (fuegoActivo)
+            {
+                // Aumentar velocidad cuando el fuego est√° activo
+                velocidadActualReporte += 0.02f;
+            }
+            else if (velocidadActualReporte > velocidadReferencia)
+            {
+                // Disminuir velocidad cuando el fuego est√° apagado
+                velocidadActualReporte -= 0.02f;
+                // Nunca menos que la velocidad de referencia
+                velocidadActualReporte = Mathf.Max(velocidadActualReporte, velocidadReferencia);
+            }
+            else if (primerReporte)
+            {
+                // Para el primer reporte, asegurar que empiece en la velocidad de referencia
+                velocidadActualReporte = velocidadReferencia;
+                primerReporte = false;
+            }
+        }
+        else
+        {
+            // Si no hay gas activo, resetear a 0
+            velocidadActualReporte = 0f;
+        }
+    }
+
+    private void DeterminarTendencia()
+    {
+        if (velocidadActualReporte > velocidadAnteriorReporte)
+        {
+            tendenciaVelocidad = "‚ñ≤"; // Aumentando
+        }
+        else if (velocidadActualReporte < velocidadAnteriorReporte)
+        {
+            tendenciaVelocidad = "‚ñº"; // Disminuyendo
+        }
+        else
+        {
+            tendenciaVelocidad = "‚ñ∫"; // Estable
         }
     }
 
@@ -71,9 +165,9 @@ public class GasDataManager : MonoBehaviour
     {
         if (textoReporte == null) return;
 
-        float presion = botonSubir.GetCurrentPressure();
-        float volumen = botonSubir.GetCurrentVolume();
-        float temperatura = temperatureController.GetCurrentTemperature();
+        float presion = botonSubir != null ? botonSubir.GetCurrentPressure() : 0f;
+        float volumen = botonSubir != null ? botonSubir.GetCurrentVolume() : 0f;
+        float temperatura = temperatureController != null ? temperatureController.GetCurrentTemperature() : 0f;
 
         textoReporte.enableAutoSizing = true;
         textoReporte.fontSizeMin = 1;
@@ -83,24 +177,77 @@ public class GasDataManager : MonoBehaviour
         Color colorPresion = ObtenerColorSegunValor(presion, botonSubir.minPressure, botonSubir.maxPressure);
         Color colorVolumen = ObtenerColorSegunValor(volumen, botonSubir.minVolume, botonSubir.maxVolume, true);
         Color colorTemp = ObtenerColorSegunValor(temperatura, temperatureController.minTemperature, temperatureController.maxTemperature);
+        Color colorVelocidad = ObtenerColorVelocidad(velocidadActualReporte);
 
-        string encabezado = string.IsNullOrEmpty(nombreGasActivo)
-            ? "<color=#000000><b>Datos del Sistema</b></color>\n"
-            : $"<b>GAS DE {nombreGasActivo} LIBERADO</b>\n";
+        reportBuilder.Clear();
 
-        textoReporte.text = encabezado +
-                           
-                           $"<color=#000000><b>Datos del Sistema:</b></color>\n" +
-                           $"<color=#{ColorUtility.ToHtmlStringRGB(colorPresion)}><b>LÌmite de presiÛn del Cilindro= {limitePresionGas:0} (atm)</b></color>\n" +
-                           $"<color=#{ColorUtility.ToHtmlStringRGB(colorPresion)}><b>PresiÛn = {presion:0.00} (atm)</b></color>\n" +
-                           $"<color=#{ColorUtility.ToHtmlStringRGB(colorVolumen)}><b>Volumen = {volumen:0.000} (m≥)</b></color>\n" +
-                           $"<color=#{ColorUtility.ToHtmlStringRGB(colorTemp)}><b>Temperatura = {temperatura:0} (∞K)</b></color>";
+        // Encabezado con gas activo
+        if (!string.IsNullOrEmpty(nombreGasActivo))
+        {
+            reportBuilder.AppendLine($"<b><color=#FF0000>GAS DE {nombreGasActivo} LIBERADO</color></b>");
 
+        
+        }
+        else
+        {
+            reportBuilder.AppendLine("<color=#000000><b>NING√öN GAS ACTIVO</b></color>");
+        }
+
+        // Datos del sistema
+        reportBuilder.AppendLine("<color=#000000><b>DATOS DEL SISTEMA:</b></color>");
+        reportBuilder.AppendLine($"<color=#{ColorUtility.ToHtmlStringRGB(colorPresion)}><b>L√≠mite de presi√≥n = {limitePresionGas:0} atm</b></color>");
+        reportBuilder.AppendLine($"<color=#{ColorUtility.ToHtmlStringRGB(colorPresion)}><b>Presi√≥n actual = {presion:0.00} atm</b></color>");
+        reportBuilder.AppendLine($"<color=#{ColorUtility.ToHtmlStringRGB(colorVolumen)}><b>Volumen = {volumen:0.000} m¬≥</b></color>");
+        reportBuilder.AppendLine($"<color=#{ColorUtility.ToHtmlStringRGB(colorTemp)}><b>Temperatura = {temperatura:0} ¬∞K</b></color>");
+
+        // Velocidad del reporte
+        if (!string.IsNullOrEmpty(nombreGasActivo))
+        {
+            reportBuilder.AppendLine($"<color=#{ColorUtility.ToHtmlStringRGB(colorVelocidad)}><b>Velocidad actual = {velocidadActualReporte:0.00} m/s {tendenciaVelocidad}</b></color>");
+        }
+        else
+        {
+            reportBuilder.AppendLine($"<color=#000000><b>Velocidad actual = 0.00 m/s</b></color>");
+        }
+
+        textoReporte.text = reportBuilder.ToString();
         LayoutRebuilder.ForceRebuildLayoutImmediate(textoReporte.rectTransform);
+    }
+
+    private float GetVelocidadReferenciaGas()
+    {
+        switch (nombreGasActivo)
+        {
+            case "HIDR√ìGENO": return velocidadReferenciaHidrogeno;
+            case "OX√çGENO": return velocidadReferenciaOxigeno;
+            case "DI√ìXIDO DE CARBONO": return velocidadReferenciaCO2;
+            default: return 0f;
+        }
+    }
+
+    private Color ObtenerColorVelocidad(float velocidad)
+    {
+        float velocidadReferencia = GetVelocidadReferenciaGas();
+
+        if (velocidadReferencia <= 0 || velocidad <= 0) return colorNormal;
+
+        // Calcular qu√© tan por encima est√° de la velocidad de referencia
+        float ratio = velocidad / velocidadReferencia;
+
+        if (ratio >= 2.0f) // M√°s del doble = PELIGRO
+            return colorPeligro;
+        else if (ratio >= 1.5f) // 50% m√°s = ALERTA
+            return colorAlerta;
+        else if (Mathf.Approximately(velocidad, velocidadReferencia)) // Exactamente en referencia
+            return new Color(1f, 1f, 0f); // Verde para velocidad referencia
+
+        return colorNormal; // Negro para valores normales
     }
 
     private Color ObtenerColorSegunValor(float valor, float min, float max, bool esVolumen = false)
     {
+        if (min >= max) return colorNormal;
+
         float normalizado = Mathf.InverseLerp(min, max, valor);
 
         if (esVolumen)

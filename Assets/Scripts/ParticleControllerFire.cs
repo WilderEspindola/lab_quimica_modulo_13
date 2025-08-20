@@ -146,4 +146,11 @@ public class ParticleControllerFire : MonoBehaviour
     {
         return currentKelvin;
     }
+    // Agrega esta propiedad pública
+    // En ParticleControllerFire, agrega esta propiedad pública:
+    public bool IsFireActive
+    {
+        get { return isHeating; }
+        private set { isHeating = value; }
+    }
 }
