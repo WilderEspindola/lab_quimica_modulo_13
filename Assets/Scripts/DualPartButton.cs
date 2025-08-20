@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
@@ -8,17 +8,17 @@ using System.Collections;
 [RequireComponent(typeof(XRSimpleInteractable))]
 public class DualPartButton : MonoBehaviour
 {
-    [Header("Configuración del Botón")]
+    [Header("ConfiguraciÃ³n del BotÃ³n")]
     public Transform[] movingParts;
     public float pressedZPosition = -0.00012f;
     public float returnSpeed = 25f;
 
-    [Header("Feedback Háptico")]
+    [Header("Feedback HÃ¡ptico")]
     public bool hapticFeedback = true;
     [Range(0, 1)] public float hapticIntensity = 0.3f;
     public float hapticDuration = 0.1f;
 
-    [Header("Control del Pistón")]
+    [Header("Control del PistÃ³n")]
     public Transform piston;
     public float pistonSpeed = 0.5f;
     public float minPistonHeight = -22.21f;
@@ -32,17 +32,17 @@ public class DualPartButton : MonoBehaviour
     public float minVolume = 0f;
     public Vector3 uiOffset = new Vector3(0, 0.1f, 0);
 
-    [Header("Medidor de Presión")]
+    [Header("Medidor de PresiÃ³n")]
     public TextMeshProUGUI pressureText;
     public float minPressure = 1f; // 1 atm
     public float maxPressure = 110f; // 15 atm
     public Color normalPressureColor = Color.white;
     public Color warningPressureColor = new Color(1f, 0.6f, 0f); // Naranja
     public Color dangerPressureColor = Color.red;
-    [Range(0, 1)] public float warningThreshold = 0.7f; // 70% de presión máxima
-    [Range(0, 1)] public float dangerThreshold = 0.9f; // 90% de presión máxima
+    [Range(0, 1)] public float warningThreshold = 0.7f; // 70% de presiÃ³n mÃ¡xima
+    [Range(0, 1)] public float dangerThreshold = 0.9f; // 90% de presiÃ³n mÃ¡xima
     [Header("Eventos de Cambio de Valores")]
-    public System.Action<float, float> OnPVValuesChanged; // Presión, Volumen
+    public System.Action<float, float> OnPVValuesChanged; // PresiÃ³n, Volumen
 
     private Vector3[] originalPositions;
     private bool isPressed = false;
@@ -51,24 +51,24 @@ public class DualPartButton : MonoBehaviour
     private float currentPressure;
 
     [Header("Efectos de Sonido")]
-    public AudioClip hydraulicSound;  // Único sonido para ambos movimientos
+    public AudioClip hydraulicSound;  // Ãšnico sonido para ambos movimientos
     public AudioSource pistonAudioSource;
     [Range(0, 1)] public float soundVolume = 0.4f;
 
     private bool wasMovingLastFrame = false;
-    [Header("Sistema de Explosión")]
-    public GameObject cylinder; // Asigna el cilindro físico aquí
-    public AudioClip explosionSound; // Sonido de explosión
-    public float explosionThreshold = 100f; // Umbral de presión para explosión
+    [Header("Sistema de ExplosiÃ³n")]
+    public GameObject cylinder; // Asigna el cilindro fÃ­sico aquÃ­
+    public AudioClip explosionSound; // Sonido de explosiÃ³n
+    public float explosionThreshold = 100f; // Umbral de presiÃ³n para explosiÃ³n
     public float resetDelay = 5f; // Tiempo en segundos para resetear
-    private bool hasExploded = false; // Control para una sola explosión
+    private bool hasExploded = false; // Control para una sola explosiÃ³n
 
     [Header("Sistema de Gases")]
     public ParticleOxigeno oxigenoController;
     public ParticleHidrogeno hidrogenoController;
     public ParticleDioxiodoCarbono co2Controller;
 
-    [Header("Límites de Presión por Gas")]
+    [Header("LÃ­mites de PresiÃ³n por Gas")]
     public float limiteVacio = 100f;
     public float limiteOxigeno = 65f;
     public float limiteHidrogeno = 85f;
@@ -77,24 +77,24 @@ public class DualPartButton : MonoBehaviour
     private string gasActivo = "VACIO";
     void Start()
     {
-        // 1. Inicializar posiciones de las partes móviles
+        // 1. Inicializar posiciones de las partes mÃ³viles
         originalPositions = new Vector3[movingParts.Length];
         for (int i = 0; i < movingParts.Length; i++)
         {
             originalPositions[i] = movingParts[i].localPosition;
         }
 
-        // 2. Configurar eventos de interacción XR
+        // 2. Configurar eventos de interacciÃ³n XR
         XRSimpleInteractable interactable = GetComponent<XRSimpleInteractable>();
         interactable.selectEntered.AddListener(OnButtonPressed);
         interactable.selectExited.AddListener(OnButtonReleased);
 
-        // 3. Forzar posición inicial exacta del pistón
+        // 3. Forzar posiciÃ³n inicial exacta del pistÃ³n
         if (piston != null)
         {
-            // Asegurar posición Y inicial exacta
+            // Asegurar posiciÃ³n Y inicial exacta
             Vector3 pistonPos = piston.localPosition;
-            pistonPos.y = maxPistonHeight; // Posición completamente arriba
+            pistonPos.y = maxPistonHeight; // PosiciÃ³n completamente arriba
             piston.localPosition = pistonPos;
 
             initialPistonY = piston.localPosition.y;
@@ -120,13 +120,14 @@ public class DualPartButton : MonoBehaviour
 
     private void ForceInitialValues()
     {
-        // Asegurar volumen exacto (5.000)
+        // Asegurar volumen exacto (5.000) CON ENCABEZADO
         if (volumeText != null)
         {
-            volumeText.text = "--- 5.000 m³ ---";
+            volumeText.text = "VOLUMEN ACTUAL DEL CILINDRO\n" +
+                              "--- 5.000 mÂ³ ---";
         }
 
-        // Asegurar presión exacta (1.00)
+        // Asegurar presiÃ³n exacta (1.00)
         if (pressureText != null)
         {
             pressureText.text = "   1.00 (atm)";
@@ -147,10 +148,10 @@ public class DualPartButton : MonoBehaviour
             firstFrame = false;
             return;
         }
-        // Movimiento del botón físico
+        // Movimiento del botÃ³n fÃ­sico
         AnimateButtonParts();
 
-        // Control del pistón y actualización de UI
+        // Control del pistÃ³n y actualizaciÃ³n de UI
         if (isPressed && piston != null)
         {
             ControlPistonMovement();
@@ -163,7 +164,7 @@ public class DualPartButton : MonoBehaviour
         }
         DetectarGasActivo();
 
-        // Detectar explosión por presión (modificado)
+        // Detectar explosiÃ³n por presiÃ³n (modificado)
         if (!hasExploded && currentPressure >= ObtenerLimiteActual())
         {
             TriggerExplosion();
@@ -171,7 +172,7 @@ public class DualPartButton : MonoBehaviour
     }
     private void DetectarGasActivo()
     {
-        // Verificar qué gas está activo
+        // Verificar quÃ© gas estÃ¡ activo
         if (oxigenoController != null && oxigenoController.targetParticleSystem.isPlaying)
         {
             gasActivo = "OXIGENO";
@@ -208,13 +209,13 @@ public class DualPartButton : MonoBehaviour
         {
             cylinder.SetActive(false);
         }
-        // Desactivar el pistón (usando la referencia existente)
+        // Desactivar el pistÃ³n (usando la referencia existente)
         if (piston != null)
         {
             piston.gameObject.SetActive(false);
         }
 
-        // Reproducir sonido de explosión
+        // Reproducir sonido de explosiÃ³n
         if (explosionSound != null)
         {
             AudioSource.PlayClipAtPoint(explosionSound, transform.position);
@@ -226,9 +227,9 @@ public class DualPartButton : MonoBehaviour
         {
             pistonAudioSource.Stop();
         }
-        // Iniciar el reseteo después del delay
+        // Iniciar el reseteo despuÃ©s del delay
         StartCoroutine(ResetSystemAfterDelay());
-        Debug.Log("¡EXPLOSIÓN! Presión crítica alcanzada: " + currentPressure + " atm");
+        Debug.Log("Â¡EXPLOSIÃ“N! PresiÃ³n crÃ­tica alcanzada: " + currentPressure + " atm");
     }
     private IEnumerator ResetSystemAfterDelay()
     {
@@ -246,25 +247,25 @@ public class DualPartButton : MonoBehaviour
             cylinder.SetActive(true);
         }
 
-        // Reactivar y resetear la posición del pistón
+        // Reactivar y resetear la posiciÃ³n del pistÃ³n
         if (piston != null)
         {
             piston.gameObject.SetActive(true);
             Vector3 pistonPos = piston.localPosition;
-            pistonPos.y = maxPistonHeight; // Posición completamente arriba
+            pistonPos.y = maxPistonHeight; // PosiciÃ³n completamente arriba
             piston.localPosition = pistonPos;
         }
 
         // Resetear los valores de UI
         ForceInitialValues();
 
-        // Resetear la bandera de explosión
+        // Resetear la bandera de explosiÃ³n
         hasExploded = false;
 
         // Sincronizar UI
         SyncVolumeUIWithPiston();
 
-        Debug.Log("Sistema reiniciado después de explosión");
+        Debug.Log("Sistema reiniciado despuÃ©s de explosiÃ³n");
     }
 
     private void AnimateButtonParts()
@@ -295,7 +296,7 @@ public class DualPartButton : MonoBehaviour
             movingParts[i].localPosition = newPos;
         }
 
-        // Feedback háptico
+        // Feedback hÃ¡ptico
         if (hapticFeedback && args.interactorObject is XRBaseInputInteractor inputInteractor)
         {
             if (inputInteractor.TryGetComponent(out XRController controller))
@@ -369,19 +370,23 @@ public class DualPartButton : MonoBehaviour
     {
         if (volumeText == null || piston == null) return;
 
-        // Usar comparación exacta para posición inicial
+        // Caso especial: pistÃ³n en posiciÃ³n mÃ¡xima (volumen mÃ¡ximo)
         if (Mathf.Approximately(piston.localPosition.y, maxPistonHeight))
         {
-            volumeText.text = "--- 5.000 m³ ---";
+            volumeText.text = "VOLUMEN ACTUAL DEL CILINDRO\n" +
+                              "--- 5.000 mÂ³ ---";
             return;
         }
 
         float normalizedPosition = Mathf.InverseLerp(minPistonHeight, maxPistonHeight, piston.localPosition.y);
         float currentVolume = Mathf.Lerp(minVolume, maxVolume, normalizedPosition);
-        volumeText.text = $"--- {currentVolume.ToString("0.000")} m³ ---";
+
+        // Nuevo formato con encabezado y flecha
+        volumeText.text = "VOLUMEN ACTUAL DEL CILINDRO\n" +
+                          $"--- {currentVolume.ToString("0.000")} mÂ³ ---";
     }
 
-    // Modifica el método UpdatePressureUI para que notifique cambios
+    // Modifica el mÃ©todo UpdatePressureUI para que notifique cambios
     private void UpdatePressureUI()
     {
         if (pressureText == null || piston == null) return;
@@ -402,7 +407,7 @@ public class DualPartButton : MonoBehaviour
         OnPVValuesChanged?.Invoke(currentPressure, GetCurrentVolume());
     }
 
-    // Asegúrate que este método sea público
+    // AsegÃºrate que este mÃ©todo sea pÃºblico
     public float GetCurrentVolume()
     {
         float normalizedPosition = Mathf.InverseLerp(minPistonHeight, maxPistonHeight, piston.localPosition.y);
