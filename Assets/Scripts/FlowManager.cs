@@ -28,6 +28,8 @@ public class FlowManager : MonoBehaviour
     [SerializeField] private AudioClip victorySound;
     [SerializeField] private AudioClip defeatSound; // ← NUEVA VARIABLE
     private AudioSource audioSource;
+    // Agregar esta variable al inicio de la clase FlowManager
+    private bool equationBalanced = false;
 
     void Start()
     {
@@ -181,6 +183,9 @@ public class FlowManager : MonoBehaviour
 
     private void OnCountdownFinished()
     {
+        // Si ya está balanceada, no mostrar mensaje de derrota
+        if (equationBalanced) return;
+
         GameManager.Instance.Timer.enabled = false;
 
         // Mostrar mensaje de derrota y reproducir sonido
@@ -192,7 +197,6 @@ public class FlowManager : MonoBehaviour
             audioSource.PlayOneShot(defeatSound);
         }
 
-        //CheckChemicalBalance();
         // Activar gesto de salida siempre al terminar el tiempo
         GameManager.Instance.LeftThumbsUp.gameObject.SetActive(true);
     }
@@ -200,6 +204,7 @@ public class FlowManager : MonoBehaviour
     // --- Sistema Químico ---
     private void StartNewChemicalEquation()
     {
+        equationBalanced = false; // ← Resetear estado de balance
         currentEquation = ReactionManager.Instance.GetRandomEquation();
         if (currentEquation == null)
         {
@@ -374,6 +379,9 @@ public class FlowManager : MonoBehaviour
     // --- Keypads y validación ---
     private void UpdateKeypadValue(char variable, int value)
     {
+        // Si ya está balanceada, ignorar cambios en keypads
+        if (equationBalanced) return;
+
         if (!keypadValues.ContainsKey(variable))
         {
             GameManager.Instance.UI_Messages.text += $"\nERROR: Variable {variable} no existe";
@@ -384,7 +392,7 @@ public class FlowManager : MonoBehaviour
         UpdateCoefficientVariable(variable, value);
 
         // Actualizar la interfaz de usuario
-        UpdateKeypadsStatusMessage(); // ¡Esta línea faltaba!
+        UpdateKeypadsStatusMessage();
 
         // Verificar balance siempre (ya no hay distinción por modo)
         CheckChemicalBalance();
@@ -392,6 +400,8 @@ public class FlowManager : MonoBehaviour
 
     private void UpdateKeypadsStatusMessage()
     {
+        // No actualizar mensajes si la ecuación ya está balanceada
+        if (equationBalanced) return;
         // 1. Crear el mensaje de estado limpio
         string statusMessage = "[Coeficientes Actuales]\n";
         statusMessage += $"Reactivos: A={keypadValues['A']}  B={keypadValues['B']}  C={keypadValues['C']}\n";
@@ -434,6 +444,9 @@ public class FlowManager : MonoBehaviour
 
     private void CheckChemicalBalance()
     {
+        // Si ya está balanceada, no hacer nada
+        if (equationBalanced) return;
+
         // 1. Inicializar mensaje de diagnóstico (sin coeficientes)
         string debugMessage = "=== Validación ===\n";
 
@@ -501,12 +514,16 @@ public class FlowManager : MonoBehaviour
 
         // 8. Resultado final
         // Modifica la sección de ecuación balanceada
-        if (isBalanced)
-        {
+        if(isBalanced)
+    {
+            equationBalanced = true; // ← ESTA LÍNEA ES CLAVE
             GameManager.Instance.UI_Messages.text = "<align=center>¡¡ ECUACIÓN BALANCEADA !!\n" +
                                                  "<color=#000000><b>!!haz un gesto para salir!!</b></color></align>";
             GameManager.Instance.LeftThumbsUp.gameObject.SetActive(true);
             GameManager.Instance.Timer.enabled = false;
+
+            // Detener la corrutina del temporizador
+            StopAllCoroutines();
 
             // Reproducir sonido de victoria (si no se está reproduciendo ya)
             if (victorySound != null && !audioSource.isPlaying)
@@ -514,7 +531,7 @@ public class FlowManager : MonoBehaviour
                 audioSource.PlayOneShot(victorySound);
             }
         }
-        else
+    else
         {
             GameManager.Instance.UI_Messages.text = debugMessage;
         }
@@ -564,6 +581,7 @@ public class FlowManager : MonoBehaviour
 
     public void RestartScene()
     {
+        equationBalanced = false; // ← Resetear estado al reiniciar
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
