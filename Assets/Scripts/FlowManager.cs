@@ -30,7 +30,7 @@ public class FlowManager : MonoBehaviour
     private AudioSource audioSource;
     // Agregar esta variable al inicio de la clase FlowManager
     private bool equationBalanced = false;
-
+    public GameObject letrasContainer; // Arrastra el objeto vacío con todas las letras aquí en el Inspector
     void Start()
     {
         // Obtener o añadir AudioSource
@@ -104,6 +104,11 @@ public class FlowManager : MonoBehaviour
         {
             if (cube != null) cube.SetActive(false);
         }
+        // Ocultar el contenedor de letras al inicio
+        if (letrasContainer != null)
+        {
+            letrasContainer.SetActive(false);
+        }
     }
 
     // --- Gestos ---
@@ -137,6 +142,11 @@ public class FlowManager : MonoBehaviour
         {
             if (cube != null) cube.SetActive(true);
         }
+        // Mostrar el contenedor de letras en modo práctica
+        if (letrasContainer != null)
+        {
+            letrasContainer.SetActive(true);
+        }
 
     }
 
@@ -154,6 +164,11 @@ public class FlowManager : MonoBehaviour
         foreach (var cube in Cubes)
         {
             if (cube != null) cube.SetActive(false);
+        }
+        // Ocultar el contenedor de letras en modo juego
+        if (letrasContainer != null)
+        {
+            letrasContainer.SetActive(false);
         }
     }
 
