@@ -34,6 +34,8 @@ public class FlowManager : MonoBehaviour
     public GameObject letrasContainer; // Arrastra el objeto vacío con todas las letras aquí en el Inspector
     public GameObject botonPrincipal;   // Arrastra el botón principal aquí en el Inspector
     public GameObject botonSecundario;  // Arrastra el botón secundario aquí en el Inspector
+    public GameObject botonPrincipal2;  // ← NUEVO SEGUNDO BOTÓN PRINCIPAL
+    public GameObject botonSecundario2; // ← NUEVO SEGUNDO BOTÓN SECUNDARIO
     void Start()
     {
         // Obtener o añadir AudioSource
@@ -107,11 +109,12 @@ public class FlowManager : MonoBehaviour
         {
             if (cube != null) cube.SetActive(false);
         }
-        // Ocultar el contenedor de letras al inicio
-        // Ocultar el contenedor de letras y botones al inicio
+        // Ocultar el contenedor de letras y todos los botones al inicio
         if (letrasContainer != null) letrasContainer.SetActive(false);
         if (botonPrincipal != null) botonPrincipal.SetActive(false);
         if (botonSecundario != null) botonSecundario.SetActive(false);
+        if (botonPrincipal2 != null) botonPrincipal2.SetActive(false);    // ← NUEVO
+        if (botonSecundario2 != null) botonSecundario2.SetActive(false);  // ← NUEVO
     }
 
     // --- Gestos ---
@@ -145,26 +148,47 @@ public class FlowManager : MonoBehaviour
         {
             if (cube != null) cube.SetActive(true);
         }
-        // Mostrar el contenedor de letras y botón principal en modo práctica
+        // Mostrar el contenedor de letras y botones principales en modo práctica
         if (letrasContainer != null) letrasContainer.SetActive(true);
         if (botonPrincipal != null) botonPrincipal.SetActive(true);
+        if (botonPrincipal2 != null) botonPrincipal2.SetActive(true);  // ← NUEVO
 
-        // El botón secundario inicia oculto (se mostrará al hacer clic en el principal)
+        // Los botones secundarios inician ocultos (se mostrarán al hacer clic en los principales)
         if (botonSecundario != null) botonSecundario.SetActive(false);
+        if (botonSecundario2 != null) botonSecundario2.SetActive(false);  // ← NUEVO
 
     }
     public void ToggleBotonSecundario()
     {
         // Reproducir sonido al hacer clic
-        if (botonClickSound != null && audioSource != null)
-        {
-            audioSource.PlayOneShot(botonClickSound);
-        }
+        ReproducirSonidoBoton();
 
         if (botonSecundario != null)
         {
             bool estadoActual = botonSecundario.activeSelf;
             botonSecundario.SetActive(!estadoActual);
+        }
+    }
+
+    // ← NUEVO MÉTODO para el segundo botón
+    public void ToggleBotonSecundario2()
+    {
+        // Reproducir sonido al hacer clic
+        ReproducirSonidoBoton();
+
+        if (botonSecundario2 != null)
+        {
+            bool estadoActual = botonSecundario2.activeSelf;
+            botonSecundario2.SetActive(!estadoActual);
+        }
+    }
+
+    // Método para reproducir sonido (compartido por todos los botones)
+    public void ReproducirSonidoBoton()
+    {
+        if (botonClickSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(botonClickSound);
         }
     }
     public void RightShakaPerformed()
@@ -182,10 +206,12 @@ public class FlowManager : MonoBehaviour
         {
             if (cube != null) cube.SetActive(false);
         }
-        // Ocultar el contenedor de letras y botones en modo juego
+        // Ocultar el contenedor de letras y todos los botones en modo juego
         if (letrasContainer != null) letrasContainer.SetActive(false);
         if (botonPrincipal != null) botonPrincipal.SetActive(false);
         if (botonSecundario != null) botonSecundario.SetActive(false);
+        if (botonPrincipal2 != null) botonPrincipal2.SetActive(false);    // ← NUEVO
+        if (botonSecundario2 != null) botonSecundario2.SetActive(false);  // ← NUEVO
     }
 
     public void LeftHandThumpsUpPerformed()
